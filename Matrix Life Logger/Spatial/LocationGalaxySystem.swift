@@ -10,9 +10,12 @@ import RealityKit
 import SwiftUI
 import CoreLocation
 import simd
+import Combine
 
 @MainActor
 class LocationGalaxySystem: ObservableObject {
+    let objectWillChange = ObservableObjectPublisher()
+    
     @Published var galaxyEntity: Entity?
     @Published var isGenerating = false
     @Published var totalLocations = 0
@@ -158,7 +161,7 @@ class LocationGalaxySystem: ObservableObject {
         let rotationAnimation = FromToByAnimation<Transform>(
             from: Transform(rotation: simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))),
             to: Transform(rotation: simd_quatf(angle: 2 * .pi, axis: SIMD3<Float>(0, 1, 0))),
-            duration: 20.0 + Float.random(in: -5...5), // Varying rotation speeds
+            duration: 20.0 + Double(Float.random(in: -5...5)), // Varying rotation speeds
             bindTarget: .transform
         )
         
@@ -198,22 +201,25 @@ class LocationGalaxySystem: ObservableObject {
     
     private func calculateBodyColor(activities: [String]) -> UIColor {
         // Color based on dominant activity
-        guard let dominantActivity = activities.first else { return .systemBlue }
+        guard let dominantActivity = activities.first else { return UIColor.systemBlue }
         
         if let activityType = ActivityType(rawValue: dominantActivity) {
             return activityType.color
         }
         
-        return .systemBlue
+        return UIColor.systemBlue
     }
     
-    private func createCelestialMaterial(color: UIColor, visitCount: Int) -> Material {
+    private func createCelestialMaterial(color: UIColor, visitCount: Int) -> RealityKit.Material {
         var material = UnlitMaterial()
         material.color = .init(tint: color)
         
         // Add glow effect for frequently visited locations
         if visitCount > 5 {
-            material.emissiveColor = .init(color: color.withAlphaComponent(0.3))
+            // UnlitMaterial does NOT support emissiveColor, so skip setting it.
+            // To simulate glow, increasing alpha tint to 0.7 for visual emphasis
+            material.color = .init(tint: color.withAlphaComponent(0.7))
+            // material.emissiveColor = .init(color: color.withAlphaComponent(0.3)) <- Not supported in UnlitMaterial
         }
         
         return material
@@ -248,7 +254,7 @@ class LocationGalaxySystem: ObservableObject {
             let orbitAnimation = FromToByAnimation<Transform>(
                 from: Transform(rotation: simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))),
                 to: Transform(rotation: simd_quatf(angle: 2 * .pi, axis: SIMD3<Float>(0, 1, 0))),
-                duration: 15.0 + Float(index) * 2.0,
+                duration: Double(15.0 + Float(index) * 2.0),
                 bindTarget: .transform
             )
             
@@ -274,9 +280,9 @@ class LocationGalaxySystem: ObservableObject {
             let angle = Float.random(in: 0...2 * .pi)
             let height = Float.random(in: -2...2)
             
-            let x = radius * cos(angle)
+            let x = radius * Float(cos(Double(angle)))
             let y = height
-            let z = radius * sin(angle)
+            let z = radius * Float(sin(Double(angle)))
             particle.position = SIMD3<Float>(x, y, z)
             
             // Small glowing particle
@@ -284,8 +290,9 @@ class LocationGalaxySystem: ObservableObject {
             let mesh = MeshResource.generateSphere(radius: size)
             
             var material = UnlitMaterial()
-            material.color = .init(tint: .white.withAlphaComponent(0.3))
-            material.emissiveColor = .init(color: .white.withAlphaComponent(0.1))
+            material.color = .init(tint: UIColor.white.withAlphaComponent(0.3))
+            // emissiveColor not available on UnlitMaterial, so skipping:
+            // material.emissiveColor = .init(color: UIColor.white.withAlphaComponent(0.1))
             
             particle.components.set(ModelComponent(mesh: mesh, materials: [material]))
             
@@ -293,13 +300,14 @@ class LocationGalaxySystem: ObservableObject {
             let floatAnimation = FromToByAnimation<Transform>(
                 from: Transform(translation: particle.position),
                 to: Transform(translation: particle.position + SIMD3<Float>(0, 0.2, 0)),
-                duration: 3.0 + Float.random(in: -1...1),
+                duration: Double(3.0 + Float.random(in: -1...1)),
                 bindTarget: .transform
             )
             
             let animationResource = try? AnimationResource.generate(with: floatAnimation)
             if let animationResource = animationResource {
-                particle.playAnimation(animationResource.repeat(playbackMode: .pingPong))
+                // There is no supported ping-pong mode in playAnimation; to mimic ping-pong, use .autoreverses if available, otherwise just repeat
+                particle.playAnimation(animationResource.repeat(), transitionDuration: 0.0)
             }
             
             galaxy.addChild(particle)
