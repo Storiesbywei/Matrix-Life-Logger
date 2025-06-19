@@ -7,8 +7,11 @@
 
 import SwiftUI
 import RealityKit
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var showingImport = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -23,6 +26,19 @@ struct ContentView: View {
             
             VStack(spacing: 15) {
                 ToggleImmersiveSpaceButton()
+                
+                Button(action: { showingImport = true }) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.down")
+                        Text("Import Life Logger Data")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .cornerRadius(10)
+                }
                 
                 HStack {
                     Image(systemName: "hand.tap")
@@ -47,6 +63,9 @@ struct ContentView: View {
             }
         }
         .padding()
+        .sheet(isPresented: $showingImport) {
+            ImportView(modelContext: modelContext)
+        }
     }
 }
 

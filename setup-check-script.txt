@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Matrix Life Logger - Setup and Safety Check Script
+# Run this before your first commit to avoid embarrassment!
+# Usage: ./setup-check.sh
+
+set -e
+
+# Colors for pretty output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🚀 Matrix Life Logger - Project Setup & Safety Check${NC}"
+echo -e "${BLUE}=================================================${NC}\n"
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to print status
+print_status() {
+    if [ $1 -eq 0 ]; then
+        echo -e "${GREEN}✅ $2${NC}"
+    else
+        echo -e "${RED}❌ $2${NC}"
+        if [ ! -z "$3" ]; then
+            echo -e "${YELLOW}   Fix: $3${NC}"
+        fi
+    fi
+}
+
+# Check for required tools
+echo -e "${BLUE}Checking required tools...${NC}"
+
+if command_exists git; then
+    print_status 0 "Git installed"
+else
+    print_status 1 "Git not found" "Install Xcode Command Line Tools: xcode-select --install"
+fi
+
+if command_exists xcodebuild; then
+    print_status 0 "Xcode Command Line Tools installed"
+else
+    print_status 1 "Xcode Command Line Tools not found" "Run: xcode-select --install"
+fi
+
+if [ -d "/Applications/Xcode.app" ]; then
+    print_status 0 "Xcode installed"
+    XCODE_VERSION=$(xcodebuild -version | head -n 1)
+    echo -e "   Version: ${XCODE_VERSION}"
+else
+    print_status 1 "Xcode not installed" "Download from Mac App Store"
+fi
+
+echo ""
+
+# Check for embarrassing files
+echo -e "${BLUE}Scanning for files that shouldn't be committed...${NC}"
+
+FOUND_SECRETS=0
+
+# Check for common secret files
+SECRET_FILES=(
+    ".env"
+    "secrets.plist"
+    "Config.plist"
+    "GoogleService-Info.plist"
+    "AuthKey_*.p8"
+    "*.p12"
+    "Secrets.swift"
+    "APIKeys.swift"
+)
+
+for pattern in "${SECRET_FILES[@]}"; do
+    if ls $pattern 1> /dev/null 2>&1; then
+        print_status 1 "Found secret file: $pattern"
+        FOUND_SECRETS=1
+    fi
+done
+
+# Check for personal data files
+if [ -d "journal_exports" ] && [ "$(ls -A journal_exports)" ]; then
+    print_status 1 "Found files in journal_exports/" "Move personal data elsewhere"
+    FOUND_SECRETS=1
+fi
+
+if [ -d "journal_db" ] && [ "$(ls -A journal_db)" ]; then
+    print_status 1 "Found files in journal_db/" "Move database files elsewhere"
+    FOUND_SECRETS=1
+fi
+
+# Check for larg
