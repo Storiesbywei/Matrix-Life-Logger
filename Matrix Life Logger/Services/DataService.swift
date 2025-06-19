@@ -57,63 +57,61 @@ class DataService: ObservableObject {
     }
     
     private func loadSampleData() {
-        // Sample data for Timeline River visualization
+        // Create date formatter for parsing timestamps
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy 'at' h:mm a"
+        
+        // Real journal entries data
         let sampleEntries = [
             JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 7), // 7 days ago
-                content: "Started working on Matrix Life Logger project. Excited about bringing spatial computing to life logging!",
-                mood: .happy,
-                activity: .work,
-                visualizationType: .orb
-            ),
-            JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 6), // 6 days ago
-                content: "Morning run in the park. Beautiful weather today.",
-                mood: .veryHappy,
-                activity: .exercise,
-                visualizationType: .particle
-            ),
-            JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 5), // 5 days ago
-                content: "Coffee with Sarah. Great conversation about spatial computing possibilities.",
-                mood: .happy,
-                activity: .social,
-                visualizationType: .orb
-            ),
-            JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 4), // 4 days ago
-                content: "Learning RealityKit. The particle systems are amazing!",
-                mood: .happy,
-                activity: .learning,
-                visualizationType: .constellation
-            ),
-            JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 3), // 3 days ago
-                content: "Family dinner. Mom's cooking is the best.",
+                timestamp: formatter.date(from: "Jun 12, 2025 at 9:40 PM") ?? Date().addingTimeInterval(-86400 * 4),
+                content: "Amazing dinner at Zingerman's Roadhouse tonight. The BBQ was incredible, but even better was the conversation with mom and dad. We ended up talking for hours about their early days in Michigan, stories I'd never heard before. Dad told me about his first job at Ford and how different Ann Arbor was in the 80s. These are the moments that matter.",
+                latitude: 42.2808,
+                longitude: -83.7430,
+                tags: ["70°F and Clear", "Zingerman's Roadhouse", "family time"],
                 mood: .veryHappy,
                 activity: .family,
                 visualizationType: .orb
             ),
             JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 2), // 2 days ago
-                content: "Watched a movie. Needed some downtime after intense coding.",
-                mood: .neutral,
-                activity: .entertainment,
+                timestamp: formatter.date(from: "Jun 13, 2025 at 7:15 AM") ?? Date().addingTimeInterval(-86400 * 3),
+                content: "Terrible sleep last night. Kept thinking about the presentation tomorrow. My brain wouldn't shut off - kept running through scenarios and what-ifs. Finally gave up around 2 AM and did some reading instead. Sometimes I think my anxiety brain is both a curse and a superpower.",
+                latitude: 42.2808,
+                longitude: -83.7430,
+                tags: ["65°F and Rainy", "Sleep", "anxiety", "presentation prep"],
+                mood: .sad,
+                activity: .health,
                 visualizationType: .particle
             ),
             JournalEntry(
-                timestamp: Date().addingTimeInterval(-86400 * 1), // 1 day ago
-                content: "Made breakthrough with Timeline River visualization. Hand gestures working perfectly!",
-                mood: .veryHappy,
-                activity: .work,
+                timestamp: formatter.date(from: "Jun 14, 2025 at 4:20 PM") ?? Date().addingTimeInterval(-86400 * 2),
+                content: "Went for a long walk around the Arb with Sarah. We talked about how technology is changing the way we remember things. She made a good point about how photos used to be special because they were rare, but now we take hundreds and remember none. Makes me think the life logging approach might be onto something - quality over quantity in capturing moments.",
+                latitude: 42.2970,
+                longitude: -83.7178,
+                tags: ["75°F and Overcast", "Personal", "The Arb", "deep conversation"],
+                mood: .happy,
+                activity: .social,
                 visualizationType: .constellation
             ),
             JournalEntry(
-                timestamp: Date(),
-                content: "Today I'm implementing the Timeline River in Matrix Life Logger. This is going to be amazing!",
+                timestamp: formatter.date(from: "Jun 15, 2025 at 10:30 AM") ?? Date().addingTimeInterval(-86400 * 1),
+                content: "Had the most productive morning session working on the new Matrix Life Logger project. The spatial computing concepts are finally clicking. There's something magical about visualizing your life data in 3D space - it makes patterns so much more obvious. Grabbed coffee from Literati and spent 3 hours coding without any distractions.",
+                latitude: 42.2808,
+                longitude: -83.7430,
+                tags: ["68°F and Sunny", "Work", "Literati", "productive coding"],
                 mood: .veryHappy,
                 activity: .work,
                 visualizationType: .orb
+            ),
+            JournalEntry(
+                timestamp: formatter.date(from: "Jun 16, 2025 at 8:55 PM") ?? Date(),
+                content: "I think my stomach is starting to feel a little better. It was the caffeine withdrawal symptoms rather than nicotine, which I'm very happy about. I can definitely feel my stomach improving. I'm currently at Socotra, a Yemeni coffeehouse on Packard Road. Yes, Yemeni—not \"Yammy\" or \"yummy.\" Wow, Yemeni. I saw a group of friends all wearing motorcycle jackets, and it got me reflecting on youth—the wonders of having a community to be around and do really cool stuff with. I miss that. That was me for about a decade at Starbucks. I thought it was awesome back then, and now looking back, I realize I had it really good.",
+                latitude: 42.2808,
+                longitude: -83.7430,
+                tags: ["73°F and Partly Cloudy", "Socotra coffeehouse", "health improvement", "community reflection"],
+                mood: .happy,
+                activity: .social,
+                visualizationType: .particle
             )
         ]
         
